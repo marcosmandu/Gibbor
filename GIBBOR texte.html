@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIBBOR - Ministério de Louvor</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Arial', sans-serif}
+  body{
+    background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070') center/cover fixed;
+    color:#d4af37; min-height:100vh;
+  }
+.header{position:sticky;top:0;background:rgba(0,0,0,0.95);border-bottom:2px solid #d4af37;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100}
+.logo{font-size:24px;font-weight:bold}
+.logo span{color:#fff}
+  nav a{color:#d4af37;text-decoration:none;margin:0 15px;font-weight:bold;cursor:pointer}
+  nav a.active{border-bottom:2px solid #d4af37}
+.btn{padding:10px 20px;background:#d4af37;color:#000;border:none;border-radius:20px;font-weight:bold;cursor:pointer;margin-left:10px}
+.btn-sair{background:#900;color:#fff}
+.container{max-width:1000px;margin:0 auto;padding:30px 20px}
+.page{display:none}
+.page.active{display:block}
+  h1{text-align:center;font-size:50px;margin-bottom:10px}
+  h1 span{color:#fff}
+  h2{text-align:center;font-size:20px;margin-bottom:30px;color:#ccc}
+.mes{background:rgba(0,0,0,0.7);border:2px solid #d4af37;border-radius:15px;margin-bottom:25px;padding:20px}
+.mes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.mes-titulo{background:#000;border:2px solid #d4af37;border-radius:10px;padding:8px 20px;font-size:20px;font-weight:bold}
+.evento{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px; margin:8px 0; border-radius:8px;
+    background:rgba(212,175,55,0.1);
+  }
+.admin-only{display:none} /* Só aparece se logado */
+.evento-text{flex:1;padding:5px}
+.evento-text.editavel{cursor:text}
+.evento-text.editavel:focus{outline:1px dashed #d4af37;background:rgba(0,0,0,0.5)}
+.icon{cursor:pointer;font-size:18px;margin-left:10px}
+.btn-add{margin-top:10px;padding:8px 15px;background:#333;color:#d4af37;border:1px solid #d4af37;border-radius:5px;font-weight:bold;cursor:pointer}
+.btn-add-mes{width:100%;padding:15px;margin-top:20px;background:#d4af37;color:#000;border:none;border-radius:10px;font-weight:bold;font-size:16px;cursor:pointer}
+.card{background:rgba(0,0,0,0.7);border:1px solid #d4af37;border-radius:15px;padding:30px;margin-bottom:20px}
+.card h3{margin-bottom:15px;color:#fff}
+ input,textarea{width:100%;padding:12px;margin:8px 0;background:#000;border:1px solid #d4af37;border-radius:5px;color:#d4af37}
+.frase{text-align:center;margin-top:40px;font-style:italic;font-size:16px;color:#ccc}
+.login-box{max-width:400px;margin:50px auto;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><span>GIBBOR</span></div>
+  <nav>
+    <a onclick="abrirPagina('inicio')" id="link-inicio" class="active">Início</a>
+    <a onclick="abrirPagina('agenda')" id="link-agenda">Agenda</a>
+    <a onclick="abrirPagina('sobre')" id="link-sobre">Sobre</a>
+    <a onclick="abrirPagina('contato')" id="link-contato">Contato</a>
+  </nav>
+  <div>
+    <button class="btn admin-only" onclick="abrirPagina('agenda')">+ Novo Evento</button>
+    <button class="btn" id="btnLogin" onclick="fazerLogin()">Login</button>
+    <button class="btn btn-sair admin-only" id="btnSair" onclick="fazerLogout()">Sair</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div class="page" id="login">
+    <div class="login-box card">
+      <h3>Área do Administrador</h3>
+      <input type="text" id="usuario" placeholder="Usuário">
+      <input type="password" id="senha" placeholder="Senha">
+      <button class="btn" onclick="entrar()">ENTRAR</button>
+      <p style="font-size:12px;margin-top:10px;color:#999">Dica: usuario = Guitarrista | senha = Guitarrista1993@</p>
+    </div>
+  </div>
+
+  <!-- PAGINA INICIO -->
+  <div class="page active" id="inicio">
+    <h1><span>GIBBOR</span></h1>
+    <h2>Ministério de Louvor e Adoração</h2>
+    <div class="card">
+      <h3>Bem-vindos!</h3>
+      <p>Levando a Palavra através da adoração. Aqui você acompanha nossa agenda.</p>
+    </div>
+    <p class="frase">"Adorai ao Senhor na beleza da santidade"</p>
+  </div>
+
+  <!-- PAGINA AGENDA -->
+  <div class="page" id="agenda">
+    <h1>AGENDA <span>2026</span></h1>
+    <div id="listaMeses"></div>
+    <button class="btn-add-mes admin-only" onclick="adicionarMes()">+ ADICIONAR NOVO MÊS</button>
+  </div>
+
+  <!-- PAGINA SOBRE -->
+  <div class="page" id="sobre">
+    <h1>SOBRE NÓS</h1>
+    <div class="card">
+      <h3>Nossa História</h3>
+      <p id="textoSobre" class="evento-text">Clique em Login para editar este texto.</p>
+    </div>
+  </div>
+
+  <!-- PAGINA CONTATO -->
+  <div class="page" id="contato">
+    <h1>CONTATO</h1>
+    <div class="card">
+      <h3>Fale Conosco</h3>
+      <input type="text" placeholder="Seu Nome">
+      <input type="email" placeholder="Seu Email">
+      <textarea rows="4" placeholder="Sua Mensagem"></textarea>
+      <button class="btn">ENVIAR MENSAGEM</button>
+    </div>
+    <div class="card">
+      <h3>Informações</h3>
+      <p id="Contato" class="evento-text">Email: gibboroficial@gmail.com<br>Instagram: @GibborOficial<br>Cel: (12)98899-9365</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let logado = false;
+let dados = JSON.parse(localStorage.getItem('agendaGibbor')) || {
+  "AGOSTO": ["Sábado | 08/08 - Santa Cecília - Reunião de Jovens","Sábado | 22/08 - Santa Cecília","Sábado | 29/08 - Igreja em Taubaté - Congresso de Jovens"],
+  "SETEMBRO": ["Sábado e Domingo | 05 e 06/09 - Putin","Sábado | 26/09 - IEAD Pinus 2 - Eliabe"]
+};
+
+// LOGIN
+function fazerLogin(){abrirPagina('login')}
+function entrar(){
+  let user = document.getElementById('usuario').value;
+  let pass = document.getElementById('senha').value;
+  if(user==='Guitarrista' && pass==='Guitarrista1993@'){
+    logado = true;
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
+    document.querySelectorAll('.editavel').forEach(el => el.contentEditable = true);
+    document.getElementById('textoSobre').contentEditable = true;
+    document.getElementById('textoContato').contentEditable = true;
+    alert('Logado com sucesso!');
+    abrirPagina('agenda');
+    carregarAgenda();
+  }else{alert('Usuário ou senha incorretos!')}
+}
+function fazerLogout(){
+  logado = false;
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('[contenteditable]').forEach(el => el.contentEditable = false);
+  alert('Você saiu.');
+  abrirPagina('inicio');
+}
+
+// NAVEGAÇÃO
+function abrirPagina(pagina){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById(pagina).classList.add('active');
+  if(document.getElementById('link-'+pagina)) document.getElementById('link-'+pagina).classList.add('active');
+  if(pagina==='agenda') carregarAgenda();
+}
+
+// AGENDA
+function carregarAgenda(){
+  const div = document.getElementById('listaMeses');div.innerHTML='';
+  Object.keys(dados).forEach(mes => {
+    let botoesAdmin = logado? `<span class="icon" onclick="removerMes('${mes}')"></span>` : '';
+    let btnAddEvento = logado? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>` : '';
+    let editavel = logado? 'editavel' : '';
+
+    div.innerHTML += `
+    <div class="mes">
+      <div class="mes-header">
+        <div class="mes-titulo">${mes}</div>
+        ${botoesAdmin}
+      </div>
+      <div id="eventos-${mes}">
+        ${dados[mes].map((e,i) => `
+          <div class="evento">
+            <div class="evento-text ${editavel}" ${logado? `contenteditable="true" onblur="atualizarEvento('${mes}',${i},this)"` : ''}>${e}</div>
+            ${logado? `<span class="icon" onclick="removerEvento('${mes}',${i})"></span>` : ''}
+          </div>
+        `).join('')}
+      </div>
+      ${btnAddEvento}
+    </div>`;
+  });
+}
+
+function adicionarEvento(mes){dados[mes].push('Novo evento - clique para editar');salvar();}
+function removerEvento(mes,i){dados[mes].splice(i,1);salvar();}
+function adicionarMes(){
+  let mes = prompt('Digite o nome do mês: EX: OUTUBRO');
+  if(mes){dados[mes.toUpperCase()] = ['Clique para adicionar evento'];salvar();}
+}
+function removerMes(mes){if(confirm('Excluir mês '+mes+'?')){delete dados[mes];salvar();}}
+function atualizarEvento(mes,i,el){dados[mes][i] = el.innerText;salvar();}
+function salvar(){localStorage.setItem('agendaGibbor', JSON.stringify(dados));carregarAgenda();}
+
+carregarAgenda();
+</script>
+</body>
+</html>
