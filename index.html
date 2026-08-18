@@ -141,7 +141,7 @@ function entrar(){
 })
 .then(response => response.json())
 .then(data => {
-  if (data.success) {
+  if (data.status ==='OK') {
     logado = true;
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
     document.querySelectorAll('.editavel').forEach(el => el.contentEditable = true);
