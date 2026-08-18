@@ -132,7 +132,16 @@ function fazerLogin(){abrirPagina('login')}
 function entrar(){
   let user = document.getElementById('usuario').value;
   let pass = document.getElementById('senha').value;
-  if(user==='Guitarrista' && pass==='Guitarrista1993@'){
+  fetch('/api/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ username: user, password: pass })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.success) {
     logado = true;
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
     document.querySelectorAll('.editavel').forEach(el => el.contentEditable = true);
@@ -141,11 +150,15 @@ function entrar(){
     alert('Logado com sucesso!');
     abrirPagina('agenda');
     carregarAgenda();
-  }else{alert('Usuário ou senha incorretos!')}
-}
-function fazerLogout(){
-  logado = false;
-  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  } else {
+    alert('Usuário ou senha incorretos!');
+  }
+})
+.catch(error => {
+  console.error('Erro:', error);
+  alert('Erro ao tentar fazer login.');
+});
+ document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   document.querySelectorAll('[contenteditable]').forEach(el => el.contentEditable = false);
   alert('Você saiu.');
   abrirPagina('inicio');
