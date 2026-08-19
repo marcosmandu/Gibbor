@@ -48,7 +48,7 @@
 <body>
 
 <div class="header">
-  <div class="logo"><span>GIBBOR</span></div>
+  <div class="logo"><span>BANDA GIBBOR</span></div>
   <nav>
     <a onclick="abrirPagina('inicio')" id="link-inicio" class="active">Início</a>
     <a onclick="abrirPagina('agenda')" id="link-agenda">Agenda</a>
@@ -71,7 +71,7 @@
       <input type="text" id="usuario" placeholder="Usuário">
       <input type="password" id="senha" placeholder="Senha">
       <button class="btn" onclick="entrar()">ENTRAR</button>
-      <p style="font-size:12px;margin-top:10px;color:#999">Dica: Só mente administrador</p>
+      <p style="font-size:12px;margin-top:10px;color:#999">Dica: Somente o administrador pode acessar</p>
     </div>
   </div>
 
@@ -106,18 +106,14 @@
   <div class="page" id="contato">
     <h1>CONTATO</h1>
     <div class="card">
-      <h3>Fale Conosco</h3>
-      <input type="text" placeholder="Seu Nome">
-      <input type="email" placeholder="Seu Email">
-      <textarea rows="4" placeholder="Sua Mensagem"></textarea>
-      <button class="btn">ENVIAR MENSAGEM</button>
+      <h3>Fale Conosco</h3>
     </div>
+
     <div class="card">
       <h3>Informações</h3>
-      <p id="Contato" class="evento-text">Email: gibboroficial@gmail.com<br>Instagram: @GibborOficial<br>Cel: (12)98899-9365</p>
+      <p id="textocontato" class="evento-text">Email: gibboroficial@gmail.com<br>Instagram: @GibborOficial<br>Cel: (12)98899-9365</p>
     </div>
-  </div>
-
+  </div>
 </div>
 
 <script>
@@ -146,7 +142,7 @@ function entrar(){
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
     document.querySelectorAll('.editavel').forEach(el => el.contentEditable = true);
     document.getElementById('textoSobre').contentEditable = true;
-    document.getElementById('textoContato').contentEditable = true;
+    document.getElementById('textocontato').contentEditable = true;
     alert('Logado com sucesso!');
     abrirPagina('agenda');
     carregarAgenda();
@@ -158,11 +154,16 @@ function entrar(){
   console.error('Erro:', error);
   alert('Erro ao tentar fazer login.');
 });
- document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+}
+
+function fazerLogout() {
+  logado = false;
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   document.querySelectorAll('[contenteditable]').forEach(el => el.contentEditable = false);
   alert('Você saiu.');
   abrirPagina('inicio');
 }
+
 
 // NAVEGAÇÃO
 function abrirPagina(pagina){
