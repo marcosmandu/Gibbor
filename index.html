@@ -180,7 +180,7 @@ function abrirPagina(pagina){
 function carregarAgenda(){
   const div = document.getElementById('listaMeses');div.innerHTML='';
   Object.keys(dados).forEach(mes => {
-    let botoesAdmin = logado ? <span class="icon" onclick="removerMes('${mes}')">🗑️</span> : '';
+    let botoesAdmin =${logado ? `<span class="icon" onclick="removerEvento('${mes}', ${i})">🗑️</span>` : ''}
     let btnAddEvento = logado? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>` : '';
     let editavel = logado? 'editavel' : '';
 
