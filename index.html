@@ -116,26 +116,7 @@
       <p id="textocontato" class="evento-text">Email: gibboroficial@gmail.com<br>Instagram: @GibborOficial<br>Cel: (12)98899-9365</p>
     </div>
   </div>
-</div>
-
-<script>
-let logado = false;
-let dados = {
-  "AGOSTO": ["Sábado / 15/08 - as 18:30h igreja Missão, Putin SJC - Ensaio da GIBBOR","Sábado | 22/08 - Santa Cecília","Sábado | 29/08 - Igreja em Taubaté - Congresso de Jovens","DOMINGO / 30/08 as 11h- igreja Missão, Putin SJC - Ensaio da GIBBOR"],
-  "SETEMBRO": ["Sábado e Domingo | 05 e 06/09 - Igreja no Putin","Sábado | 26/09 - IEAD Pinus 2 - Eliabe"]
-};
-
-// LOGIN
-function fazerLogin(){abrirPagina('login')}
-function entrar(){
-  let user = document.getElementById('usuario').value;
-  let pass = document.getElementById('senha').value;
-  fetch('/api/login', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ username: user, password: pass })
+</div>
 })
 .then(response => response.json())
 .then(data => {
@@ -176,9 +157,78 @@ function abrirPagina(pagina){
   if(pagina==='agenda') carregarAgenda();
 }
 
-// AGENDA
 
+
+
+
+// AGENDA
 <script>
+let logado = false;
+
+let dados = {
+  "AGOSTO": [
+    "Sábado / 15/08 - as 18:30h igreja Missão, Putin SJC - Ensaio da GIBBOR",
+    "Sábado | 22/08 - Santa Cecília",
+    "Sábado | 29/08 - Igreja em Taubaté - Congresso de Jovens",
+    "DOMINGO / 30/08 as 11h- igreja Missão, Putin SJC - Ensaio da GIBBOR"
+  ],
+  "SETEMBRO": [
+    "Sábado e Domingo | 05 e 06/09 - Igreja no Putin",
+    "Sábado | 26/09 - IEAD Pinus 2 - Eliabe"
+  ]
+};
+
+function fazerLogin(){ abrirPagina('login'); }
+
+function entrar(){
+  let user = document.getElementById('usuario').value;
+  let pass = document.getElementById('senha').value;
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ username: user, password: pass })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'OK') {
+      logado = true;
+      document.getElementById('btnLogin').style.display = 'none';
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
+      document.getElementById('textoSobre').contentEditable = true;
+      document.getElementById('textocontato').contentEditable = true;
+      alert('Logado com sucesso!');
+      abrirPagina('agenda');
+      carregarAgenda();
+    } else {
+      alert('Usuário ou senha incorretos!');
+    }
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+    alert('Erro ao tentar fazer login.');
+  });
+}
+
+function fazerLogout() {
+  logado = false;
+  document.getElementById('btnLogin').style.display = 'inline-block';
+  document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => el.contentEditable = false);
+  alert('Você saiu.');
+  abrirPagina('inicio');
+}
+
+function abrirPagina(pagina){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const page = document.getElementById(pagina);
+  if (page) page.classList.add('active');
+  const link = document.getElementById('link-' + pagina);
+  if (link) link.classList.add('active');
+  if (pagina === 'agenda') carregarAgenda();
+}
+
 function carregarAgenda(){
   const div = document.getElementById('listaMeses');
   div.innerHTML = '';
@@ -206,16 +256,48 @@ function carregarAgenda(){
       </div>`;
   });
 }
-
-function adicionarEvento(mes){dados[mes].push('Novo evento - clique para editar');salvar();}
-function removerEvento(mes,i){dados[mes].splice(i,1);salvar();}
+
+function adicionarEvento(mes){
+  dados[mes].push('Novo evento - clique para editar');
+  salvar();
+}
+
+function removerEvento(mes, i){
+  dados[mes].splice(i, 1);
+  salvar();
+}
+
 function adicionarMes(){
   let mes = prompt('Digite o nome do mês: EX: OUTUBRO');
-  if(mes){dados[mes.toUpperCase()] = ['Clique para adicionar evento'];salvar();}
+  if (mes) {
+    dados[mes.toUpperCase()] = ['Clique para adicionar evento'];
+    salvar();
+  }
 }
-function removerMes(mes){if(confirm('Excluir mês '+mes+'?')){delete dados[mes];salvar();}}
-function atualizarEvento(mes,i,el){dados[mes][i] = el.innerText;salvar();}
-function salvar(){carregarAgenda();}
+
+function removerMes(mes){
+  if (confirm('Excluir mês ' + mes + '?')) {
+    delete dados[mes];
+    salvar();
+  }
+}
+
+function atualizarEvento(mes, i, el){
+  dados[mes][i] = el.innerText;
+  salvar();
+}
+
+function salvar(){
+  localStorage.setItem('agendaGibbor', JSON.stringify(dados));
+  carregarAgenda();
+}
+
+function carregarSalvo(){
+  const salvo = localStorage.getItem('agendaGibbor');
+  if (salvo) dados = JSON.parse(salvo);
+}
+
+carregarSalvo();
 carregarAgenda();
 </script>
 </body>
