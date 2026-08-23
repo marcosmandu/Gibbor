@@ -177,32 +177,36 @@ function abrirPagina(pagina){
 }
 
 // AGENDA
+
+<script>
 function carregarAgenda(){
-  const div = document.getElementById('listaMeses');div.innerHTML='';
+  const div = document.getElementById('listaMeses');
+  div.innerHTML = '';
+
   Object.keys(dados).forEach(mes => {
-    let botoesAdmin =${logado ? `<span class="icon" onclick="removerEvento('${mes}', ${i})">🗑️</span>` : ''}
-    let btnAddEvento = logado? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>` : '';
-    let editavel = logado? 'editavel' : '';
+    const btnAddEvento = logado ? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>` : '';
+    const btnRemoverMes = logado ? `<span class="icon" onclick="removerMes('${mes}')">🗑️</span>` : '';
+    const editavel = logado ? 'editavel' : '';
 
     div.innerHTML += `
-    <div class="mes">
-      <div class="mes-header">
-        <div class="mes-titulo">${mes}</div>
-        ${botoesAdmin}
-      </div>
-      <div id="eventos-${mes}">
-        ${dados[mes].map((e,i) => `
-          <div class="evento">
-            <div class="evento-text ${editavel}" ${logado? `contenteditable="true" onblur="atualizarEvento('${mes}',${i},this)"` : ''}>${e}</div>
-            ${logado ? `<span class="icon"  onclick="removerEvento('${mes}', ${i})">🗑️</span>` : ''}
-          </div>
-        `).join('')}
-      </div>
-      ${btnAddEvento}
-    </div>`;
+      <div class="mes">
+        <div class="mes-header">
+          <div class="mes-titulo">${mes}</div>
+          ${btnRemoverMes}
+        </div>
+        <div id="eventos-${mes}">
+          ${dados[mes].map((e, i) => `
+            <div class="evento">
+              <div class="evento-text ${editavel}" ${logado ? `contenteditable="true" onblur="atualizarEvento('${mes}', ${i}, this)"` : ''}>${e}</div>
+              ${logado ? `<span class="icon" onclick="removerEvento('${mes}', ${i})">🗑️</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${btnAddEvento}
+      </div>`;
   });
 }
-
+
 function adicionarEvento(mes){dados[mes].push('Novo evento - clique para editar');salvar();}
 function removerEvento(mes,i){dados[mes].splice(i,1);salvar();}
 function adicionarMes(){
