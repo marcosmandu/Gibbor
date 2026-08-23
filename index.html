@@ -118,6 +118,11 @@
   </div>
 </div>
 
+
+
+
+<!-- Java-script -->
+
 <script>
 let logado = false;
 let dados = {
@@ -141,7 +146,7 @@ function entrar(){
 .then(data => {
   if (data.status ==='OK') {
     logado = true;
-    document.qetElementByld('btnLogin').style.display = 'none'
+    document.getElementById('btnLogin').style.display = 'none'
     document.querySelectorAll('.admin-only').forEach(el=> el.style.display= 'inline-block');
     document.querySelectorAll('.editavel').forEach(el => el.contentEditable = true);
     document.getElementById('textoSobre').contentEditable = true;
