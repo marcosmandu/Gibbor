@@ -194,7 +194,7 @@ function carregarAgenda(){
         ${dados[mes].map((e,i) => `
           <div class="evento">
             <div class="evento-text ${editavel}" ${logado? `contenteditable="true" onblur="atualizarEvento('${mes}',${i},this)"` : ''}>${e}</div>
-            ${logado ? `<span class="icon" onclick="removerEvento('${mes}')">🗑️</span>` : ''}
+            ${logado ? `<span class="icon"  onclick="removerEvento('${mes}', ${i})">🗑️</span>` : ''}
           </div>
         `).join('')}
       </div>
