@@ -10,7 +10,6 @@
     background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070') center/cover fixed;
     color:#d4af37; min-height:100vh;
   }
-  
 .header{position:sticky;top:0;background:rgba(0,0,0,0.95);border-bottom:2px solid #d4af37;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100}
 .logo{font-size:24px;font-weight:bold}
 .logo span{color:#fff}
@@ -32,7 +31,6 @@
     padding:12px; margin:8px 0; border-radius:8px;
     background:rgba(212,175,55,0.1);
   }
-  
 .admin-only{display:none} /* Só aparece se logado */
 .evento-text{flex:1;padding:5px}
 .evento-text.editavel{cursor:text}
@@ -45,6 +43,18 @@
  input,textarea{width:100%;padding:12px;margin:8px 0;background:#000;border:1px solid #d4af37;border-radius:5px;color:#d4af37}
 .frase{text-align:center;margin-top:40px;font-style:italic;font-size:16px;color:#ccc}
 .login-box{max-width:400px;margin:50px auto;text-align:center}
+
+/* CARROSSEL */
+.carousel { position: relative; max-width: 100%; margin: 25px auto; overflow: hidden; border-radius: 12px; border: 2px solid #d4af37; }
+.carousel-inner { display: flex; transition: transform 0.6s ease; }
+.carousel-slide { min-width: 100%; }
+.carousel-slide img { width: 100%; height: 340px; object-fit: cover; display: block; }
+.carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.6); color:#d4af37; border:none; width:44px;height:44px; border-radius:50%; font-size:22px; cursor:pointer; z-index:2; }
+.carousel-prev { left: 12px; }
+.carousel-next { right: 12px; }
+.carousel-dots { text-align:center; padding:10px; background:rgba(0,0,0,.5); }
+.dot { display:inline-block; width:12px;height:12px; border-radius:50%; background:#555; margin:0 5px; cursor:pointer; border:1px solid #777; }
+.dot.active { background:#d4af37; border-color:#fff; }
 </style>
 </head>
 
@@ -81,6 +91,22 @@
   <div class="page active" id="inicio">
     <h1><span>GIBBOR</span></h1>
     <h2>Ministério de Louvor e Adoração</h2>
+
+    <div class="carousel">
+      <div class="carousel-inner" id="carouselInner">
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070" alt="Imagem 1"></div>
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=2070" alt="Imagem 2"></div>
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070" alt="Imagem 3"></div>
+      </div>
+      <button class="carousel-nav carousel-prev" onclick="mudarSlide(-1)">❮</button>
+      <button class="carousel-nav carousel-next" onclick="mudarSlide(1)">❯</button>
+      <div class="carousel-dots">
+        <span class="dot active" onclick="irParaSlide(0)"></span>
+        <span class="dot" onclick="irParaSlide(1)"></span>
+        <span class="dot" onclick="irParaSlide(2)"></span>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Bem-vindos!</h3>
       <p>Levando a Palavra através da adoração. Aqui você acompanha nossa agenda.</p>
@@ -110,7 +136,6 @@
     <div class="card">
       <h3>Fale Conosco</h3>
     </div>
-
     <div class="card">
       <h3>Informações</h3>
       <p id="textocontato" class="evento-text">Email: gibboroficial@gmail.com<br>Instagram: @GibborOficial<br>Cel: (12)98899-9365</p>
@@ -118,12 +143,10 @@
   </div>
 </div>
 
+
 <script>
 let logado = false;
-let dados = {
-  "AGOSTO": ["Sábado / 15/08 - as 18:30h igreja Missão, Putin SJC - Ensaio da GIBBOR","Sábado | 22/08 - Santa Cecília","Sábado | 29/08 - Igreja em Taubaté - Congresso de Jovens","DOMINGO / 30/08 as 11h- igreja Missão, Putin SJC - Ensaio da GIBBOR"],
-  "SETEMBRO": ["Sábado e Domingo | 05 e 06/09 - Igreja no Putin","Sábado | 26/09 - IEAD Pinus 2 - Eliabe"]
-};
+let dados = { };
 
 // LOGIN
 function fazerLogin(){abrirPagina('login')}
@@ -159,6 +182,7 @@ function entrar(){
 });
 }
 
+//LOGOUT
 function fazerLogout() {
   logado = false;
   document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
@@ -177,29 +201,58 @@ function abrirPagina(pagina){
 }
 
 // AGENDA
-function carregarAgenda(){
-  const div = document.getElementById('listaMeses');div.innerHTML='';
+async function carregarAgenda() {
+  try {
+    const resposta = await fetch("/api/agenda");
+    if (!resposta.ok) {
+      throw new Error("Erro ao carregar a agenda");
+    }
+    dados = await resposta.json();
+    console.log("Agenda recebida da API:", dados);
+  } catch (erro) {
+    console.error("Erro ao carregar agenda:", erro);
+    alert("Não foi possível carregar a agenda.");
+    return;
+  }
+  const div = document.getElementById('listaMeses');
+  div.innerHTML = '';
+
   Object.keys(dados).forEach(mes => {
-    let botoesAdmin = logado? `<span class="icon" onclick="removerMes('${mes}')"></span>` : '';
-    let btnAddEvento = logado? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>` : '';
-    let editavel = logado? 'editavel' : '';
+    let botoesAdmin = logado
+      ? `<span class="icon" onclick="removerMes('${mes}')">🗑️</span>`
+      : '';
+
+    let btnAddEvento = logado
+      ? `<button class="btn-add" onclick="adicionarEvento('${mes}')">+ ADICIONAR EVENTO</button>`
+      : '';
+
+    let editavel = logado ? 'editavel' : '';
 
     div.innerHTML += `
-    <div class="mes">
-      <div class="mes-header">
-        <div class="mes-titulo">${mes}</div>
-        ${botoesAdmin}
+      <div class="mes">
+        <div class="mes-header">
+          <div class="mes-titulo">${mes}</div>
+          ${botoesAdmin}
+        </div>
+
+        <div id="eventos-${mes}">
+          ${dados[mes].map((e,i) => `
+            <div class="evento">
+              <div class="evento-text ${editavel}"
+                ${logado ? `contenteditable="true" onblur="atualizarEvento('${mes}',${i},this)"` : ''}>
+                ${e}
+              </div>
+
+              ${logado
+                ? `<span class="icon" onclick="removerEvento('${mes}',${i})">🗑️</span>`
+                : ''}
+            </div>
+          `).join('')}
+        </div>
+
+        ${btnAddEvento}
       </div>
-      <div id="eventos-${mes}">
-        ${dados[mes].map((e,i) => `
-          <div class="evento">
-            <div class="evento-text ${editavel}" ${logado? `contenteditable="true" onblur="atualizarEvento('${mes}',${i},this)"` : ''}>${e}</div>
-            ${logado? `<span class="icon" onclick="removerEvento('${mes}',${i})"></span>` : ''}
-          </div>
-        `).join('')}
-      </div>
-      ${btnAddEvento}
-    </div>`;
+    `;
   });
 }
 
@@ -212,6 +265,20 @@ function adicionarMes(){
 function removerMes(mes){if(confirm('Excluir mês '+mes+'?')){delete dados[mes];salvar();}}
 function atualizarEvento(mes,i,el){dados[mes][i] = el.innerText;salvar();}
 function salvar (){carregarAgenda();}
+
+// CARROSSEL JS
+let slideAtual = 0;
+function mostrarSlide(n){
+  const inner = document.getElementById('carouselInner');
+  const dots = document.querySelectorAll('.dot');
+  const total = inner.children.length;
+  if(n>=total) slideAtual=0; else if(n<0) slideAtual=total-1; else slideAtual=n;
+  inner.style.transform = `translateX(-${slideAtual*100}%)`;
+  dots.forEach((d,i)=>d.classList.toggle('active', i===slideAtual));
+}
+function mudarSlide(dir){mostrarSlide(slideAtual+dir)}
+function irParaSlide(n){mostrarSlide(n)}
+setInterval(()=>mudarSlide(1), 5000);
 carregarAgenda();
 </script>
 </body>
