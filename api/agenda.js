@@ -1,8 +1,10 @@
 let dadosAgenda = {
   "SETEMBRO": [
     "Sábado | 26/09 - IEAD Pinus 2 - Eliabe"
-  ]
-};
+  ],
+  "NOVEMBRO": [
+    "Sábado e Domingo 21e22/11/26 - Panorama - CLEYTON"
+]};
 
 export default function handler(req, res) {
 
